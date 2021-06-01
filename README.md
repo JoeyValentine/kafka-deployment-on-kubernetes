@@ -1,46 +1,46 @@
 # Deploying Kafka with Strimzi(0.23.0)
-This tutorial shows you how to run Apache Kafka on Kubernetes.
+This tutorial shows you how to run Apache Kafka on Kubernetes.  
 
 # Creating a local StorageClass for Kafka
 If you are using a different type of PV, you can skip this process.  
-<code>
+```
 kubectl apply -f ./manifests/local-storage-class.yaml
-</code>
+```
 
 # Creating a local persistent volume for Kafka
 If you are using a different type of PV, you can skip this process.
 In the case of local PV, it must be created for each node.  
-<code>
+```
 kubectl apply -f ./manifests/local-persistent-volume.yaml
-</code>
+```
 
 # Creating a namespace for Kafka
-<code>
+```
 kubectl create namespace strimzi
-</code>
+```
 
 # Add the Strimzi Helm Chart repository:
-<code>
+```
 helm repo add strimzi https://strimzi.io/charts/
-</code>
+```
 
 # To install the chart:
-<code>
+```
 helm install --generate-name -n strimzi strimzi/strimzi-kafka-operator
-</code>
+```
 
 # Create the Kafka cluster
-<code>
+```
 kubectl apply -n strimzi -f ./manifests/kafka-ephemeral.yaml
-</code>
+```
 
 # Add Prometheus and Grafana
 You can use Prometheus to provide monitoring data for the example 
 [Grafana dashboards](https://github.com/strimzi/strimzi-kafka-operator/tree/main/examples/metrics/grafana-dashboards) 
 provided with Strimzi. You need to know the matching labels of the Pod Monitor Selector by entering the following command.  
-<code>
+```
 kubectl describe prometheus -n monitoring
-</code>
+```
 
 ```
 Pod Monitor Selector:
@@ -51,9 +51,9 @@ Pod Monitor Selector:
 Modify value of namespaceSelector.matchNames property to strimzi in strimzi-pod-monitor.yaml. 
 And add <code>Release: kube-prometheus-stack</code> labels to each PodMonitor in strimzi-pod-monitor.yaml.
 
-<code>
+```
 kubectl apply -n monitoring -f ./manifests/strimzi-pod-monitor.yaml
-</code>
+```
 
 # How to run cassandra-stress benchmark
 
@@ -97,14 +97,14 @@ bin/kafka-producer-perf-test.sh \
 # Cleaning up
 
 1. Run the following command to get the release name of the kafka namespace  
-<code>
+```
 helm ls -n strimzi
-</code>
+```
 
 2. To uninstall/delete the <code>RELEASE_NAME</code> deployment:  
-<code>
+```
 helm delete -n strimzi RELEASE_NAME
-</code>
+```
    
 3. You have to manually delete related CRDs.
 
