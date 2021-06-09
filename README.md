@@ -55,7 +55,7 @@ And add <code>Release: kube-prometheus-stack</code> labels to each PodMonitor in
 kubectl apply -n monitoring -f ./manifests/strimzi-pod-monitor.yaml
 ```
 
-# How to run cassandra-stress benchmark
+# How to run Kafka benchmark
 
 Get the node port number of the external bootstrap service (replace my-cluster with the name of your cluster):  
 
