@@ -1,43 +1,63 @@
 # Deploying Kafka with Strimzi(0.23.0)
+
 This tutorial shows you how to run Apache Kafka on Kubernetes.  
 
-# Creating a local StorageClass for Kafka
+
+
+## Creating a local StorageClass for Kafka
+
 If you are using a different type of PV, you can skip this process.  
+
 ```
 kubectl apply -f ./manifests/local-storage-class.yaml
 ```
 
-# Creating a local persistent volume for Kafka
+
+## Creating a local persistent volume for Kafka
+
 If you are using a different type of PV, you can skip this process.
 In the case of local PV, it must be created for each node.  
+
 ```
 kubectl apply -f ./manifests/local-persistent-volume.yaml
 ```
 
-# Creating a namespace for Kafka
+
+## Creating a namespace for Kafka
+
 ```
 kubectl create namespace strimzi
 ```
 
-# Add the Strimzi Helm Chart repository:
+
+## Add the Strimzi Helm Chart repository:
+
 ```
 helm repo add strimzi https://strimzi.io/charts/
 ```
 
-# To install the chart:
+
+## To install the chart:
+
 ```
 helm install --generate-name -n strimzi strimzi/strimzi-kafka-operator
 ```
 
-# Create the Kafka cluster
+
+## Create the Kafka cluster
+
 ```
 kubectl apply -n strimzi -f ./manifests/kafka-ephemeral.yaml
 ```
 
-# Add Prometheus and Grafana
+
+## Add Prometheus and Grafana
+
 You can use Prometheus to provide monitoring data for the example 
 [Grafana dashboards](https://github.com/strimzi/strimzi-kafka-operator/tree/main/examples/metrics/grafana-dashboards) 
-provided with Strimzi. You need to know the matching labels of the Pod Monitor Selector by entering the following command.  
+provided with Strimzi.  
+You need to know the matching labels of the Pod Monitor Selector by entering the following command.  
+
 ```
 kubectl describe prometheus -n monitoring
 ```
@@ -48,23 +68,24 @@ Pod Monitor Selector:
     Release:  kube-prometheus-stack
 ```
 
-Modify value of namespaceSelector.matchNames property to strimzi in strimzi-pod-monitor.yaml. 
-And add <code>Release: kube-prometheus-stack</code> labels to each PodMonitor in strimzi-pod-monitor.yaml.
+Modify value of namespaceSelector.matchNames property to strimzi in strimzi-pod-monitor.yaml.  
+And add `Release: kube-prometheus-stack` labels to each PodMonitor in strimzi-pod-monitor.yaml.
 
 ```
 kubectl apply -n monitoring -f ./manifests/strimzi-pod-monitor.yaml
 ```
 
-# How to run Kafka benchmark
+
+## How to run Kafka benchmark
 
 Get the node port number of the external bootstrap service (replace my-cluster with the name of your cluster):  
 
 ```
-kubectl get service my-cluster-kafka-external-bootstrap \
-  -o=jsonpath='{.spec.ports[0].nodePort}{"\n"}'
+kubectl get service --namespace=strimzi my-cluster-kafka-external-bootstrap -o=jsonpath='{.spec.ports[0].nodePort}{"\n"}'
 ```
 
 kafka-topics.sh
+
 ```
 bin/kafka-topics.sh \
   --bootstrap-server KAFKA_IP:KAFKA_PORT \
@@ -75,6 +96,7 @@ bin/kafka-topics.sh \
 ```
 
 kafka-consumer-perf-test.sh
+
 ```
 bin/kafka-consumer-perf-test.sh \
   --bootstrap-server KAFKA_IP:KAFKA_PORT \
@@ -84,6 +106,7 @@ bin/kafka-consumer-perf-test.sh \
 ```
 
 kafka-producer-perf-test.sh
+
 ```
 bin/kafka-producer-perf-test.sh \
   --topic test \
@@ -94,14 +117,17 @@ bin/kafka-producer-perf-test.sh \
   --producer.config ./producer.properties
 ```
 
-# Cleaning up
+
+## Cleaning up
 
 1. Run the following command to get the release name of the kafka namespace  
+
 ```
 helm ls -n strimzi
 ```
 
-2. To uninstall/delete the <code>RELEASE_NAME</code> deployment:  
+2. To uninstall/delete the `RELEASE_NAME` deployment:  
+
 ```
 helm delete -n strimzi RELEASE_NAME
 ```
